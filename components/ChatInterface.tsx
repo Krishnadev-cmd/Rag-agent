@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 
@@ -9,12 +9,35 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  sourceFile?: string;
 }
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [currentFile, setCurrentFile] = useState<string>('');
+  const [loadingFile, setLoadingFile] = useState(true);
+
+  // Load the current latest file on component mount
+  useEffect(() => {
+    const loadLatestFile = async () => {
+      try {
+        const response = await fetch('/api/latest-file');
+        const data = await response.json();
+        
+        if (data.success && data.latestFile) {
+          setCurrentFile(data.latestFile);
+        }
+      } catch (error) {
+        console.error('Failed to load latest file:', error);
+      } finally {
+        setLoadingFile(false);
+      }
+    };
+
+    loadLatestFile();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,8 +73,14 @@ const ChatInterface = () => {
           text: data.response,
           isUser: false,
           timestamp: new Date(),
+          sourceFile: data.sourceFile,
         };
         setMessages(prev => [...prev, botMessage]);
+        
+        // Update current file if it changed
+        if (data.sourceFile && data.sourceFile !== currentFile) {
+          setCurrentFile(data.sourceFile);
+        }
       } else {
         throw new Error(data.error || 'Failed to get response');
       }
@@ -71,6 +100,21 @@ const ChatInterface = () => {
 
   return (
     <div className="flex flex-col h-96 max-w-2xl mx-auto border rounded-lg bg-white shadow-lg">
+      {/* Header showing current file */}
+      <div className="border-b p-3 bg-gray-50 rounded-t-lg">
+        <div className="text-sm text-gray-600">
+          {loadingFile ? (
+            <span>Loading current document...</span>
+          ) : currentFile ? (
+            <span>
+              📄 Currently using: <span className="font-medium text-gray-800">{currentFile}</span>
+            </span>
+          ) : (
+            <span className="text-orange-600">⚠️ No documents available. Please upload a document first.</span>
+          )}
+        </div>
+      </div>
+
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
@@ -91,9 +135,14 @@ const ChatInterface = () => {
                 }`}
               >
                 <p className="text-sm">{message.text}</p>
-                <p className="text-xs opacity-70 mt-1">
-                  {message.timestamp.toLocaleTimeString()}
-                </p>
+                <div className="text-xs opacity-70 mt-1">
+                  <div>{message.timestamp.toLocaleTimeString()}</div>
+                  {message.sourceFile && !message.isUser && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      📄 Source: {message.sourceFile}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))

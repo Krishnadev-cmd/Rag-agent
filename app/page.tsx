@@ -20,7 +20,12 @@ export default function Home() {
         {/* Upload Section */}
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-semibold mb-4">Upload Documents</h2>
-          <Input_button />
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-medium mb-2">File Upload</h3>
+              <Input_button />
+            </div>
+          </div>
         </div>
 
         {/* Chat Section */}

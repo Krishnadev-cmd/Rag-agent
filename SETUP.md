@@ -1,6 +1,6 @@
 # RAG Chatbot Setup Guide
 
-This is a complete RAG (Retrieval Augmented Generation) chatbot built with Next.js, OpenAI, and Pinecone.
+This is a complete RAG (Retrieval Augmented Generation) chatbot built with Next.js, Google Gemini, and Pinecone.
 
 ## Features
 
@@ -18,18 +18,18 @@ This is a complete RAG (Retrieval Augmented Generation) chatbot built with Next.
 Create a `.env.local` file with:
 
 ```env
-# OpenAI API Configuration
-OPENAI_API_KEY=your_openai_api_key_here
+# Google Gemini API Configuration
+GOOGLE_API_KEY=your_google_api_key_here
 
 # Pinecone Configuration
 PINECONE_API_KEY=your_pinecone_api_key_here
-PINECONE_INDEX_NAME=rag-documents
+PINECONE_INDEX_NAME=ai-agent
 ```
 
-### 2. OpenAI API Key
+### 2. Google Gemini API Key
 
-1. Go to [OpenAI Platform](https://platform.openai.com/)
-2. Sign up/Login and go to API Keys
+1. Go to [Google AI Studio](https://aistudio.google.com/)
+2. Sign up/Login and go to "Get API Key"
 3. Create a new API key
 4. Add it to your `.env.local` file
 
@@ -38,8 +38,8 @@ PINECONE_INDEX_NAME=rag-documents
 1. Go to [Pinecone](https://www.pinecone.io/)
 2. Sign up for a free account
 3. Create a new index with:
-   - **Name**: `rag-documents`
-   - **Dimensions**: `1536` (for OpenAI text-embedding-3-small)
+   - **Name**: `rag-gemini-768`
+   - **Dimensions**: `768` (for Gemini embedding-001 model)
    - **Metric**: `cosine`
 4. Get your API key from the dashboard
 5. Add both to your `.env.local` file
@@ -85,12 +85,13 @@ User Question → Query Embedding → Similarity Search → Context Retrieval �
 ### Common Issues
 
 1. **"Failed to create embeddings"**
-   - Check your OpenAI API key
-   - Ensure you have credits in your OpenAI account
+   - Check your Google API key
+   - Ensure your Google AI Studio project has the necessary permissions
+   - Make sure the Gemini API is enabled
 
 2. **"Failed to store in vector database"**
    - Verify your Pinecone API key
-   - Check that your index exists and has correct dimensions (1536)
+   - Check that your index exists and has correct dimensions (768 for Gemini)
 
 3. **"No relevant documents found"**
    - Make sure you've uploaded and processed documents first
@@ -102,7 +103,7 @@ Make sure your `.env.local` file is in the root directory (same level as `packag
 
 ## Costs
 
-- **OpenAI**: ~$0.0001 per 1K tokens (embeddings) + ~$0.002 per 1K tokens (chat)
+- **Google Gemini**: Free tier with generous limits (1,500 requests per day for text generation, embedding is free)
 - **Pinecone**: Free tier includes 1M vectors
 
 ## Next Steps
